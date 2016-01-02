@@ -34,7 +34,7 @@ class Publish extends DefaultTask {
       }
       git.close()
 
-      publishRepository = SubmoduleWalk.getSubmoduleRepository(blogRepository, "output")
+      publishRepository = new FileRepositoryBuilder().setMustExist(true).setGitDir(project.file("$project.buildDir/published/.git")).build()
       git = new Git(publishRepository)
       git.add().addFilepattern(".").call()
       git.commit().setMessage("""Publishing new version of the blog.
@@ -52,11 +52,30 @@ This new version includes changes up to commit SHA ${blogRepository.getRef("dev"
 import org.jbake.app.*
 model {
   tasks {
+    create("clean") {
+      doLast {
+        assert buildDir.delete()
+      }
+    }
+    create("syncLatestPublished") {
+      File localPath = file("$buildDir/published")
+      outputs.upToDateWhen { localPath.exists() }
+      doLast {
+        Git git = null
+        try {
+          git = Git.cloneRepository().setBranch("master").setURI("ssh://git@github.com/heisenbugblog/heisenbugblog.github.io.git").setDirectory(localPath).call()
+          git.checkout().setName("master").call()
+        } finally {
+          git?.close()
+        }
+      }
+    }
     create("bake") {
+      dependsOn "syncLatestPublished"
       doLast {
         try {
           File source = projectDir
-          File destination = file("output")
+          File destination = file("$buildDir/published")
           Oven oven = new Oven(source, destination, true)
           oven.setupPaths()
           oven.bake()
@@ -66,6 +85,7 @@ model {
       }
     }
     create("publish", Publish) {
+      dependsOn "syncLatestPublished"
       dependsOn "bake"
     }
   }
