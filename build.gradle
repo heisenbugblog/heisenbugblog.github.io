@@ -11,6 +11,42 @@ buildscript {
   }
 }
 
+import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.api.Status
+import org.eclipse.jgit.api.errors.GitAPIException
+import org.eclipse.jgit.lib.Repository
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder
+import org.eclipse.jgit.submodule.SubmoduleWalk
+class Publish extends DefaultTask {
+  @TaskAction
+  void doAction() {
+    Repository blogRepository = null
+    Repository publishRepository = null
+    Git git = null
+
+    try {
+      blogRepository = new FileRepositoryBuilder().setMustExist(true).setGitDir(project.file(".git")).build()
+
+      git = new Git(blogRepository)
+      Status status = git.status().call()
+      if (!status.isClean()) {
+        throw new Exception("Uncommited changes, please commit them.")
+      }
+      blogGit.close()
+
+      publishRepository = SubmoduleWalk.getSubmoduleRepository(blogRepository, "output")
+      git = new Git(publishRepository)
+      git.add().addFilepattern(".").call()
+      git.commit().setMessage("Publishing changes up to commit '${blogRepository.getRef("dev").objectId.name}'.").call()
+      git.push().call()
+    } finally {
+      blogRepository?.close()
+      publishRepository?.close()
+      git?.close()
+    }
+  }
+}
+
 import org.jbake.app.*
 model {
   tasks {
@@ -26,6 +62,9 @@ model {
           println e
         }
       }
+    }
+    create("publish", Publish) {
+      dependsOn "bake"
     }
   }
 }
