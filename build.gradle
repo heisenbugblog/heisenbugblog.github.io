@@ -37,7 +37,9 @@ class Publish extends DefaultTask {
       publishRepository = SubmoduleWalk.getSubmoduleRepository(blogRepository, "output")
       git = new Git(publishRepository)
       git.add().addFilepattern(".").call()
-      git.commit().setMessage("Publishing changes up to commit ${blogRepository.getRef("dev").objectId.name}.").call()
+      git.commit().setMessage("""Publishing new version of the blog.
+
+This new version includes changes up to commit ${blogRepository.getRef("dev").objectId.name}.""").call()
       git.push().call()
     } finally {
       blogRepository?.close()
