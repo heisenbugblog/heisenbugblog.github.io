@@ -1,4 +1,4 @@
 [submodule "output"]
 	path = output
 	url = git@github.com:heisenbugblog/heisenbugblog.github.io.git
-  ignore = dirty
+  ignore = all

@@ -32,7 +32,7 @@ class Publish extends DefaultTask {
       if (!status.isClean()) {
         throw new Exception("Uncommited changes, please commit them.")
       }
-      blogGit.close()
+      git.close()
 
       publishRepository = SubmoduleWalk.getSubmoduleRepository(blogRepository, "output")
       git = new Git(publishRepository)
