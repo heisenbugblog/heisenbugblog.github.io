@@ -39,7 +39,7 @@ class Publish extends DefaultTask {
       git.add().addFilepattern(".").call()
       git.commit().setMessage("""Publishing new version of the blog.
 
-This new version includes changes up to commit ${blogRepository.getRef("dev").objectId.name}.""").call()
+This new version includes changes up to commit SHA ${blogRepository.getRef("dev").objectId.name}.""").call()
       git.push().call()
     } finally {
       blogRepository?.close()
