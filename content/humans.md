@@ -1,0 +1,3 @@
+type=humanstxt
+status=published
+~~~~~~

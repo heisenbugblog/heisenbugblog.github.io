@@ -26,6 +26,9 @@
     <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
     <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">-->
     <link rel="shortcut icon" href="<#if (content.rootpath)??>${content.rootpath}<#else></#if>favicon.ico">
+    
+    <!-- http://humanstxt.org -->
+    <link type="text/plain" rel="author" href="/humans.txt"/>
   </head>
   <body onload="prettyPrint()">
     <div id="wrap">
